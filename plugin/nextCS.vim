@@ -9,6 +9,9 @@ endif
 
 let loaded_nextCS = 1
 
+let s:save_cpo = &cpo
+set cpo&vim
+
 function! l:avoidECN()
     if exists('g:colors_name')
         let result = index(g:colorSchemesDetected, g:colors_name)
@@ -26,8 +29,9 @@ endfunction
 
 function! l:getCS() "getColorSheme
     "this search in the color directories for *.vim files and add them to
-    "colorSchemesDetected 
-    let g:colorSchemesDetected = map(split(globpath(&runtimepath, "colors/*.vim", "\n")), 'fnamemodify(v:val, ":t:r")')
+    "colorSchemesDetected
+    "let g:colorSchemesDetected = map(split(globpath(&runtimepath, "colors/*.vim", "\n")), 'fnamemodify(v:val, ":t:r")')
+    let g:colorSchemesDetected = map(split(globpath(&runtimepath, "colors/*.vim")), 'fnamemodify(v:val, ":t:r")')
 
     if empty(g:colorSchemesDetected)
         echo 'You do not have any color file'
@@ -56,6 +60,7 @@ function! NextCS()
     catch /E185:/
         call l:avoidECN()
     endtry
+    highlight clear SignColumn
     redraw!
     echo g:colorSchemesDetected[g:current]
 endfunction
@@ -75,9 +80,12 @@ function! PreviousCS()
     catch /E185:/
         call l:avoidECN()
     endtry
+    highlight clear SignColumn
     redraw!
     echo g:colorSchemesDetected[g:current]
 endfunction
 
 nnoremap <F12> :call NextCS() <CR>
 nnoremap <F11> :call PreviousCS() <CR>
+
+let &cpo = s:save_cpo
